@@ -8,6 +8,10 @@ let editingWalletId = null;
 
 // ---- INIT ----
 document.addEventListener('DOMContentLoaded', () => {
+  // Auto-select primary wallet on load
+  const primary = WalletStore.getPrimary();
+  if (primary) selectedWallet = primary.id;
+
   document.getElementById('f-date').value = today();
   document.getElementById('trf-date').value = today();
   initCats(); initWalletSelects(); refresh();
