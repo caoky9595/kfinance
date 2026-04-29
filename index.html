@@ -374,6 +374,16 @@
       outline: none;
       transition: all 0.2s;
       backdrop-filter: blur(10px);
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    select.fi {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%238e8ca0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      background-size: 18px;
+      padding-right: 40px;
     }
 
     .fi:focus {
@@ -1000,6 +1010,54 @@
       margin-bottom: 6px
     }
 
+    .frow {
+      display: flex;
+      gap: 12px;
+      margin: 0 20px 20px;
+    }
+
+    .frow input,
+    .frow select {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--glass-border);
+      border-radius: 18px;
+      padding: 12px 18px;
+      color: var(--t);
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.2s;
+      backdrop-filter: blur(10px);
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .frow input {
+      flex: 1;
+    }
+
+    .frow select {
+      width: 120px;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%238e8ca0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 16px;
+      padding-right: 36px;
+    }
+
+    .frow input::placeholder {
+      color: var(--t3);
+      opacity: 0.7;
+    }
+
+    .frow input:focus,
+    .frow select:focus {
+      border-color: var(--p);
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 15px rgba(162, 155, 254, 0.15);
+    }
+
     .empty p {
       font-size: 12px
     }
@@ -1182,13 +1240,15 @@
       <h3><span class="mi" style="font-size:16px;color:var(--p)">receipt_long</span>Lịch sử<span class="badge"
           id="count">0</span></h3>
     </div>
-    <div class="frow"><input type="text" id="f-search" placeholder="Tìm kiếm..." oninput="applyFilter()" /><select
-        id="f-filter" onchange="applyFilter()" style="max-width:90px">
+    <div class="frow">
+      <input type="text" id="f-search" placeholder="Tìm kiếm giao dịch..." oninput="applyFilter()" />
+      <select id="f-filter" onchange="applyFilter()" style="width:110px">
         <option value="">Tất cả</option>
-        <option value="expense">Chi</option>
-        <option value="income">Thu</option>
-        <option value="transfer">Chuyển</option>
-      </select></div>
+        <option value="expense">Khoản chi</option>
+        <option value="income">Khoản thu</option>
+        <option value="transfer">Chuyển ví</option>
+      </select>
+    </div>
     <div id="txn-list" style="padding-bottom:28px"></div>
 
     <!-- SETTINGS OVERLAY -->
