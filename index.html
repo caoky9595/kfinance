@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#0d0d18" />
+  <title>KFinance</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    rel="stylesheet" />
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #0d0d18;
+      --s: #1a1a2e;
+      --c: rgba(26, 26, 46, 0.7);
+      --ch: rgba(162, 155, 254, 0.15);
+      --t: #ffffff;
+      --t2: #c8c4d3;
+      --t3: #8e8ca0;
+      --p: #a29bfe;
+      --ps: #8e85f0;
+      --g: #55efc4;
+      --gs: #00b894;
+      --r: #fab1a0;
+      --rs: #ff7675;
+      --sh: 0 10px 40px rgba(0, 0, 0, 0.4);
+      --sab: env(safe-area-inset-bottom, 0px);
+      --glass-border: rgba(255, 255, 255, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg);
+      color: var(--t);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden
+    }
+
+    .mi,
+    .mif {
+      font-family: 'Material Symbols Outlined';
+      vertical-align: middle;
+    }
+
+    .mi {
+      font-variation-settings: 'FILL' 0, 'wght' 400;
+    }
+
+    .mif {
+      font-variation-settings: 'FILL' 1, 'wght' 400;
+    }
+
+    .app {
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100dvh
+    }
+
+    @media(min-width:768px) {
+      .app {
+        max-width: 560px
+      }
+    }
+
+    /* Header */
+    .hdr {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(13, 13, 24, 0.85);
+      backdrop-filter: blur(25px);
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .hdr .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .hdr .logo-img {
+      width: 38px;
+      height: 38px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 8px rgba(162, 155, 254, 0.4));
+    }
+
+    .hdr h1 {
+      font-size: 20px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--p), var(--g));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    .ibtn {
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      border: 1px solid var(--glass-border);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--t2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      backdrop-filter: blur(10px);
+    }
+
+    .ibtn:active {
+      transform: scale(0.92);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Wallet Strip */
+    .wallets {
+      display: flex;
+      gap: 10px;
+      padding: 10px 20px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth
+    }
+
+    .wallets::-webkit-scrollbar {
+      display: none
+    }
+
+    .wcard {
+      flex-shrink: 0;
+      padding: 16px 18px;
+      border-radius: 24px;
+      background: var(--c);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--sh);
+      width: 170px;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+      white-space: nowrap
+    }
+
+    .wcard.selected {
+      border-color: var(--p);
+      background: linear-gradient(135deg, rgba(162, 155, 254, 0.2), rgba(26, 26, 46, 0.8));
+      transform: scale(1.05);
+    }
+
+    .wcard .wname {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--t2);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 2px
+    }
+
+    .wcard .wname .mi {
+      font-size: 13px
+    }
+
+    .wcard .wbal {
+      font-size: 13px;
+      font-weight: 800
+    }
+
+    .wcard .wbank {
+      font-size: 8px;
+      color: var(--t3);
+      margin-top: 1px
+    }
+
+    .wcard .star {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      font-size: 12px;
+      color: var(--p)
+    }
+
+    .wcard-add {
+      min-width: 48px;
+      flex-shrink: 0;
+      padding: 8px;
+      border-radius: 12px;
+      border: 2px dashed var(--b);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--t3);
+      gap: 1px;
+      scroll-snap-align: start
+    }
+
+    .wcard-add:active {
+      background: rgba(255, 255, 255, 0.03)
+    }
+
+    .wcard-add .mi {
+      font-size: 18px
+    }
+
+    .wcard-add span:last-child {
+      font-size: 8px;
+      font-weight: 600
+    }
+
+    /* Summary */
+    .sumrow {
+      display: flex;
+      gap: 10px;
+      padding: 10px 20px
+    }
+
+    .sitem {
+      flex: 1;
+      padding: 16px 12px;
+      border-radius: 24px;
+      background: var(--c);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--sh);
+      text-align: center
+    }
+
+    .sitem .sl {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--t3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px
+    }
+
+    .sitem .sv {
+      font-size: 14px;
+      font-weight: 800;
+      margin-top: 1px
+    }
+
+    .sv.inc {
+      color: var(--gs)
+    }
+
+    .sv.exp {
+      color: var(--rs)
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      padding: 0 20px;
+      gap: 6px;
+      margin-bottom: 6px
+    }
+
+    .tab {
+      flex: 1;
+      padding: 12px 0;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      border: none;
+      border-radius: 20px 20px 0 0;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: 0;
+      color: var(--t3);
+      position: relative
+    }
+
+    .tab.act {
+      color: var(--p);
+      background: var(--c);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-bottom: none;
+    }
+
+    .tab .mi {
+      font-size: 16px;
+      display: block;
+      margin: 0 auto 1px
+    }
+
+    /* Tab body */
+    .tbody {
+      background: var(--c);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      margin: 0 20px;
+      border-radius: 0 0 24px 24px;
+      padding: 20px;
+      margin-bottom: 12px;
+      box-shadow: var(--sh);
+    }
+
+    .tbody.hid {
+      display: none
+    }
+
+    /* Upload zone */
+    .uz {
+      border: 2px dashed var(--b);
+      border-radius: 14px;
+      padding: 28px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s
+    }
+
+    .uz:active,
+    .uz.drag {
+      border-color: var(--p);
+      background: rgba(108, 92, 231, 0.08)
+    }
+
+    .uz .mi {
+      font-size: 36px;
+      color: var(--t3);
+      margin-bottom: 6px
+    }
+
+    .uz p {
+      font-size: 12px;
+      color: var(--t2)
+    }
+
+    .uz .cta {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 9px 22px;
+      border-radius: 12px;
+      background: var(--p);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer
+    }
+
+    /* Forms */
+    .fi {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 14px 18px;
+      font-size: 15px;
+      color: var(--t);
+      font-family: 'Nunito';
+      outline: none;
+      transition: all 0.2s;
+      backdrop-filter: blur(10px);
+    }
+
+    .fi:focus {
+      border-color: var(--p);
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 0 15px rgba(162, 155, 254, 0.2);
+    }
+
+    .fl {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--t3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 3px;
+      display: block
+    }
+
+    .fg {
+      display: grid;
+      gap: 7px;
+      margin-bottom: 10px
+    }
+
+    .fg3 {
+      grid-template-columns: 1fr 1fr 1fr
+    }
+
+    .fg2 {
+      grid-template-columns: 1fr 1fr
+    }
+
+    .type-toggle {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 10px
+    }
+
+    .tbtn {
+      flex: 1;
+      padding: 14px;
+      border-radius: 20px;
+      border: 1px solid var(--glass-border);
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--t2);
+      backdrop-filter: blur(10px);
+    }
+
+    .tbtn.aexp {
+      background: rgba(250, 177, 160, 0.15);
+      color: var(--r);
+      border-color: var(--r);
+    }
+
+    .tbtn.ainc {
+      background: rgba(85, 239, 196, 0.15);
+      color: var(--g);
+      border-color: var(--g);
+    }
+
+    .tbtn.atrf {
+      background: rgba(162, 155, 254, 0.15);
+      color: var(--p);
+      border-color: var(--p);
+    }
+
+    .cg {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+      margin: 6px 0 10px
+    }
+
+    .ci {
+      padding: 12px 6px;
+      border-radius: 20px;
+      border: 1px solid var(--glass-border);
+      background: rgba(255, 255, 255, 0.03);
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      backdrop-filter: blur(5px);
+    }
+
+    .ci.sel {
+      border-color: var(--p);
+      background: rgba(162, 155, 254, 0.15);
+      box-shadow: 0 5px 15px rgba(162, 155, 254, 0.1);
+    }
+
+    .ci .mi {
+      font-size: 22px;
+      display: block;
+      margin: 0 auto 2px
+    }
+
+    .ci>span:last-child {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--t2)
+    }
+
+    /* Buttons */
+    .bp {
+      width: 100%;
+      padding: 16px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, var(--p), var(--ps));
+      box-shadow: 0 10px 25px rgba(162, 155, 254, 0.4);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 800;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .bp:active {
+      transform: scale(0.95) translateY(2px);
+      box-shadow: 0 5px 15px rgba(162, 155, 254, 0.3);
+    }
+
+    .bg {
+      width: 100%;
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--glass-border);
+      color: var(--t2);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: all 0.2s;
+    }
+
+    .bg:active {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .bd {
+      background: rgba(250, 177, 160, 0.2);
+      color: var(--r);
+      border: 1px solid var(--r);
+    }
+
+    /* Mapping */
+    .mr {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+      margin-bottom: 7px
+    }
+
+    .mr label {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--t3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 2px;
+      display: block
+    }
+
+    .pt {
+      width: 100%;
+      overflow-x: auto;
+      margin: 6px 0;
+      border-radius: 9px;
+      background: var(--ch)
+    }
+
+    .pt table {
+      width: 100%;
+      font-size: 10px;
+      border-collapse: collapse
+    }
+
+    .pt th,
+    .pt td {
+      padding: 5px 7px;
+      text-align: left;
+      white-space: nowrap;
+      border-bottom: 1px solid var(--b)
+    }
+
+    .pt th {
+      color: var(--t3);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 8px;
+      letter-spacing: 0.5px
+    }
+
+    /* Section hdr */
+    .shdr {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px
+    }
+
+    .shdr h3 {
+      font-size: 16px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--t)
+    }
+
+    .shdr .badge {
+      font-size: 11px;
+      background: #fff;
+      box-shadow: var(--sh);
+      padding: 3px 10px;
+      border-radius: 99px;
+      color: var(--p);
+      font-weight: 800
+    }
+
+    .frow {
+      display: flex;
+      gap: 8px;
+      padding: 0 20px 10px
+    }
+
+    .frow input,
+    .frow select {
+      flex: 1;
+      background: #fff;
+      border: 2px solid transparent;
+      box-shadow: var(--sh);
+      border-radius: 12px;
+      padding: 9px 12px;
+      font-size: 13px;
+      color: var(--t);
+      font-family: 'Nunito';
+      outline: none;
+      transition: all 0.2s
+    }
+      outline: none
+    }
+
+    /* Charts */
+    .chtg {
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      color: var(--t2);
+      font-size: 12px;
+      font-weight: 600
+    }
+
+    .chtg .mi:last-child {
+      transition: transform 0.3s
+    }
+
+    .chtg.open .mi:last-child {
+      transform: rotate(180deg)
+    }
+
+    .chbd {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease;
+      padding: 0 16px
+    }
+
+    .chbd.open {
+      max-height: 800px;
+      padding-bottom: 10px
+    }
+
+    .chc {
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 16px;
+      margin-bottom: 10px;
+      box-shadow: var(--sh);
+    }
+
+    /* Transaction list */
+    .tg {
+      padding: 0 16px;
+      margin-bottom: 3px
+    }
+
+    .td {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 3px;
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--t3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px
+    }
+
+    .ti {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      background: var(--glass);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      margin-bottom: 8px;
+      box-shadow: var(--sh);
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .ti:active {
+      transform: scale(0.97);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .tic {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: var(--ch);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0
+    }
+
+    .tii {
+      flex: 1;
+      min-width: 0
+    }
+
+    .tii .nm {
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .tii .mt {
+      font-size: 9px;
+      color: var(--t3);
+      margin-top: 1px
+    }
+
+    .ta {
+      font-size: 15px;
+      font-weight: 800;
+      white-space: nowrap
+    }
+
+    .ta.inc {
+      color: #00b894
+    }
+
+    .ta.exp {
+      color: #ff7675
+    }
+
+    .ta.trf {
+      color: var(--p)
+    }
+
+    /* Custom confirm dialog */
+    .confirm-ov {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      animation: fadeIn 0.15s ease
+    }
+
+    .confirm-ov.show { display: block }
+
+    .confirm-bg {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(8px)
+    }
+
+    .confirm-panel {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #1a1a2e;
+      border-radius: 32px 32px 0 0;
+      padding: 24px 20px calc(24px + var(--sab));
+      animation: su 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 -10px 40px rgba(0,0,0,0.4);
+      border-top: 1px solid var(--glass-border);
+    }
+
+    .confirm-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: rgba(231, 76, 60, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px
+    }
+
+    .confirm-icon .mi {
+      font-size: 26px;
+      color: var(--rs)
+    }
+
+    .confirm-title {
+      font-size: 16px;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 6px
+    }
+
+    .confirm-desc {
+      font-size: 12px;
+      color: var(--t2);
+      text-align: center;
+      margin-bottom: 16px;
+      line-height: 1.5
+    }
+
+    .confirm-preview {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px;
+      background: var(--ch);
+      border-radius: 20px;
+      margin-bottom: 20px
+    }
+
+    .confirm-preview .cp-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      background: var(--ch);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0
+    }
+
+    .confirm-preview .cp-info { flex: 1; min-width: 0 }
+    .confirm-preview .cp-name { font-size: 12px; font-weight: 600 }
+    .confirm-preview .cp-meta { font-size: 9px; color: var(--t3); margin-top: 1px }
+    .confirm-preview .cp-amount { font-size: 14px; font-weight: 800; white-space: nowrap }
+
+    .confirm-btns {
+      display: flex;
+      gap: 8px
+    }
+
+    .confirm-btns button {
+      flex: 1;
+      padding: 14px;
+      border-radius: 18px;
+      border: none;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Nunito'
+    }
+
+    .confirm-btns button:active { transform: scale(0.96) }
+
+    .btn-confirm-cancel {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--glass-border) !important;
+      color: var(--t2)
+    }
+
+    .btn-confirm-delete {
+      background: var(--r);
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(250, 177, 160, 0.3);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0 }
+      to { opacity: 1 }
+    }
+
+    /* Overlays */
+    .ov {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: none
+    }
+
+    .ov.show {
+      display: block
+    }
+
+    .ovbg {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(6px)
+    }
+
+    .ovp {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      max-height: 88vh;
+      background: #1a1a2e;
+      border-radius: 28px 28px 0 0;
+      padding: 24px 20px calc(24px + var(--sab));
+      overflow-y: auto;
+      animation: su 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      border-top: 1px solid var(--glass-border);
+      box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+    }
+
+    @keyframes su {
+      from {
+        transform: translateY(100%)
+      }
+
+      to {
+        transform: translateY(0)
+      }
+    }
+
+    .ovh {
+      width: 40px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 99px;
+      margin: 0 auto 20px;
+    }
+
+    /* Import preview */
+    .ipi {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 9px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 7px;
+      margin-bottom: 3px;
+      font-size: 11px
+    }
+
+    .ipi .mt {
+      font-size: 9px;
+      color: var(--t3)
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 999;
+      padding: 12px 24px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      background: rgba(26, 26, 46, 0.9);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      animation: sd 0.4s cubic-bezier(0.16, 1, 0.3, 1), fo 0.4s ease 2.6s forwards;
+      max-width: 85vw;
+      color: var(--t);
+    }
+
+    .toast.success {
+      border-color: var(--g)
+    }
+
+    .toast.error {
+      border-color: var(--r)
+    }
+
+    @keyframes sd {
+      from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0)
+      }
+    }
+
+    @keyframes fo {
+      to {
+        opacity: 0
+      }
+    }
+
+    .empty {
+      text-align: center;
+      padding: 28px 16px;
+      color: var(--t3)
+    }
+
+    .empty .mi {
+      font-size: 36px;
+      margin-bottom: 6px
+    }
+
+    .empty p {
+      font-size: 12px
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(0.7)
+    }
+
+    ::-webkit-scrollbar {
+      width: 3px
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--t3);
+      border-radius: 99px
+    }
+
+    /* Wallet overlay extras */
+    .wform .color-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin: 6px 0 10px
+    }
+
+    .wform .cpick {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer
+    }
+
+    .wform .cpick.sel {
+      border-color: #fff;
+      box-shadow: 0 0 0 2px var(--p)
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+
+    <!-- HEADER -->
+    <div class="hdr">
+      <div class="logo-group">
+        <img src="assets/logo.png" class="logo-img" alt="KFinance">
+        <h1>KFinance</h1>
+      </div>
+      <button class="ibtn mi" onclick="toggleSettings()">settings</button>
+    </div>
+
+    <!-- WALLET STRIP -->
+    <div class="wallets" id="wallet-strip"></div>
+
+    <!-- SUMMARY -->
+    <div class="sumrow" id="summary"></div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab act" onclick="switchTab('excel')" id="tab-excel"><span
+          class="mi">upload_file</span>Excel</button>
+      <button class="tab" onclick="switchTab('text')" id="tab-text"><span class="mi">edit_note</span>Nhập tay</button>
+      <button class="tab" onclick="switchTab('transfer')" id="tab-transfer"><span class="mi">swap_horiz</span>Chuyển
+        ví</button>
+    </div>
+
+    <!-- TAB: EXCEL -->
+    <div class="tbody" id="body-excel">
+      <div id="upload-zone" class="uz" onclick="document.getElementById('file-input').click()"
+        ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')"
+        ondrop="handleDrop(event)">
+        <span class="mi">cloud_upload</span>
+        <p><b>Chọn hoặc kéo thả file Excel</b></p>
+        <p style="font-size:10px;color:var(--t3);margin-top:3px">.xlsx · .xls · .csv</p>
+        <button class="cta" type="button">Chọn file</button>
+        <input type="file" id="file-input" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleFile(event)" />
+      </div>
+      <div id="map-section" style="display:none">
+        <div id="col-mappers" class="mr"></div>
+        <div class="pt">
+          <table>
+            <thead>
+              <tr id="pv-head"></tr>
+            </thead>
+            <tbody id="pv-body"></tbody>
+          </table>
+        </div>
+        <p id="imp-summary" style="font-size:11px;color:var(--t2);margin:6px 0"></p>
+        <div id="imp-list" style="max-height:180px;overflow-y:auto;margin-bottom:8px"></div>
+        <button class="bp" onclick="confirmImport()">Nhập dữ liệu</button>
+        <button class="bg" onclick="cancelImport()">Hủy</button>
+      </div>
+    </div>
+
+    <!-- TAB: TEXT -->
+    <div class="tbody hid" id="body-text">
+      <form id="txn-form" onsubmit="saveTxn(event)">
+        <div class="type-toggle">
+          <button type="button" class="tbtn aexp" data-t="expense" onclick="setType('expense')">Chi tiêu</button>
+          <button type="button" class="tbtn" data-t="income" onclick="setType('income')">Thu nhập</button>
+        </div>
+        <input type="hidden" id="f-type" value="expense" /><input type="hidden" id="f-edit" value="" />
+        <div>
+          <div class="fl">Số tiền (VND)</div><input type="number" id="f-amount" class="fi" placeholder="0" required
+            min="1" style="font-size:18px;font-weight:800" />
+        </div>
+        <div class="fl" style="margin-top:7px">Danh mục</div>
+        <div class="cg" id="cat-grid"></div>
+        <input type="hidden" id="f-cat" value="food" />
+        <div class="fg fg3">
+          <div>
+            <div class="fl">Ngày</div><input type="date" id="f-date" class="fi" />
+          </div>
+          <div>
+            <div class="fl">Ghi chú</div><input type="text" id="f-note" class="fi" placeholder="..." />
+          </div>
+          <div>
+            <div class="fl">Ví</div><select id="f-wallet" class="fi"></select>
+          </div>
+        </div>
+        <button type="submit" class="bp">Lưu giao dịch</button>
+        <div id="edit-actions" style="display:none;margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <button type="button" id="btn-cancel" class="bg" onclick="cancelEdit()" style="margin:0">Hủy sửa</button>
+          <button type="button" id="btn-delete-txn" class="bg bd" onclick="deleteEditingTxn()" style="margin:0">
+            <span class="mi" style="font-size:16px;margin-right:6px">delete_outline</span>Xóa
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- TAB: TRANSFER -->
+    <div class="tbody hid" id="body-transfer">
+      <form id="trf-form" onsubmit="doTransfer(event)">
+        <div>
+          <div class="fl">Số tiền chuyển (VND)</div><input type="number" id="trf-amount" class="fi" placeholder="0"
+            required min="1" style="font-size:18px;font-weight:800" />
+        </div>
+        <div class="fg fg2" style="margin-top:8px">
+          <div>
+            <div class="fl">Từ ví</div><select id="trf-from" class="fi"></select>
+          </div>
+          <div>
+            <div class="fl">Đến ví</div><select id="trf-to" class="fi"></select>
+          </div>
+        </div>
+        <div class="fg" style="margin-top:4px">
+          <div>
+            <div class="fl">Ghi chú</div><input type="text" id="trf-note" class="fi"
+              placeholder="Chuyển tiền giữa các ví..." />
+          </div>
+          <div>
+            <div class="fl">Ngày</div><input type="date" id="trf-date" class="fi" />
+          </div>
+        </div>
+        <button type="submit" class="bp" style="background:linear-gradient(135deg,#5b4cc9,#9b59b6)">
+          <span class="mi" style="font-size:16px;margin-right:4px">swap_horiz</span> Chuyển tiền</button>
+      </form>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="chtg" onclick="toggleCharts(this)"><span class="mi"
+        style="font-size:16px;color:var(--p)">analytics</span>Thống kê<span class="mi"
+        style="font-size:16px">expand_more</span></div>
+    <div class="chbd" id="chart-body">
+      <div class="chc">
+        <div style="font-size:11px;font-weight:700;margin-bottom:6px">Chi tiêu theo danh mục</div>
+        <div style="display:flex;align-items:center;justify-content:center"><canvas id="donut" width="150"
+            height="150"></canvas></div>
+        <div id="donut-leg" style="margin-top:6px"></div>
+      </div>
+      <div class="chc">
+        <div style="font-size:11px;font-weight:700;margin-bottom:6px">7 ngày gần đây</div>
+        <div style="height:160px"><canvas id="bar"></canvas></div>
+      </div>
+    </div>
+
+    <!-- TXN LIST -->
+    <div class="shdr">
+      <h3><span class="mi" style="font-size:16px;color:var(--p)">receipt_long</span>Lịch sử<span class="badge"
+          id="count">0</span></h3>
+    </div>
+    <div class="frow"><input type="text" id="f-search" placeholder="Tìm kiếm..." oninput="applyFilter()" /><select
+        id="f-filter" onchange="applyFilter()" style="max-width:90px">
+        <option value="">Tất cả</option>
+        <option value="expense">Chi</option>
+        <option value="income">Thu</option>
+        <option value="transfer">Chuyển</option>
+      </select></div>
+    <div id="txn-list" style="padding-bottom:28px"></div>
+
+    <!-- SETTINGS OVERLAY -->
+    <div class="ov" id="settings-ov">
+      <div class="ovbg" onclick="closeSettings()"></div>
+      <div class="ovp">
+        <div class="ovh"></div>
+        <h3 style="font-size:15px;font-weight:800;margin-bottom:14px">Cài đặt</h3>
+        <div id="settings-body"></div>
+      </div>
+    </div>
+
+    <!-- WALLET FORM OVERLAY -->
+    <div class="ov" id="wallet-ov">
+      <div class="ovbg" onclick="closeWalletForm()"></div>
+      <div class="ovp wform">
+        <div class="ovh"></div>
+        <h3 id="wf-title" style="font-size:15px;font-weight:800;margin-bottom:14px">Thêm ví mới</h3>
+        <div id="wallet-form-body"></div>
+      </div>
+    </div>
+
+    <!-- DELETE CONFIRM DIALOG -->
+    <div class="confirm-ov" id="delete-confirm">
+      <div class="confirm-bg" onclick="cancelDeleteConfirm()"></div>
+      <div class="confirm-panel">
+        <div class="confirm-icon"><span class="mi">delete_forever</span></div>
+        <div class="confirm-title">Xóa giao dịch?</div>
+        <div class="confirm-desc">Giao dịch này sẽ bị xóa vĩnh viễn và không thể khôi phục.</div>
+        <div id="delete-preview"></div>
+        <div class="confirm-btns">
+          <button class="btn-confirm-cancel" onclick="cancelDeleteConfirm()">Hủy</button>
+          <button class="btn-confirm-delete" onclick="confirmDeleteTxn()"><span class="mi" style="font-size:16px;margin-right:4px;vertical-align:middle">delete</span>Xóa</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/store.js"></script>
+  <script src="js/app.js"></script>
+</body>
+
+</html>
